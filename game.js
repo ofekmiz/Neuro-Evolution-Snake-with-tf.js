@@ -16,9 +16,9 @@ let ctx;
 let rate_slider;
 let game_loop_interval;
 let apple;
-let best_score = 0;
-let games = 0;
-let generation = 0;
+let best_score;
+let games;
+let generation;
 let autosave;
 
 //SETUP
@@ -35,6 +35,9 @@ function setup(brain) {
     canvas.width = CANVAS_SIZE;
     ctx = canvas.getContext("2d");
     document.addEventListener("keydown", keyDown);
+    best_score = 0;
+    games = 0;
+    generation = 0;
     if (human_player) {
         snakes[0] = new Snake("human");
     } else {
@@ -229,6 +232,18 @@ async function loadBrainFiles() {
         newGame();
     } catch (error) {
         console.log("Brain files Not supported, please use the right json & bin files");
+    }
+}
+
+async function loadTrainedBrain(){
+    try {
+        const model = await tf.loadLayersModel('https://raw.githubusercontent.com/ofekmiz/Neuro-Evolution-Snake-with-tf.js/main/snake_brains/snake_gen_13_score_40_walls_false.json');
+        let brain = new NeuralNetwork(model, Snake.INPUT_NODES, Snake.HIDDEN_NODES, Snake.OUTPUT_NODES);
+        setup(brain);
+        newGame();
+        generation = 74;
+    } catch (error) {
+        console.log(error);
     }
 }
 
