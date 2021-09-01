@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    <title>Snake NeuroEvolution with tf.js</title>
+</head>
+
+<body>
+    <script src="nn.js"></script>
+    <script src="ga.js"></script>
+    <script src="snake.js"></script>
+    <script src="game.js"></script>
+    <div>
+        <canvas id="snake_game" onclick="getMousePos(event)"></canvas>
+        <div>life: <span id="life">0</span></div>
+        <div>score: <span id="score">0</span></div>
+        <div>best score: <span id="best_score">0</span></div>
+        <div>total games: <span id="games">0</span></div>
+        <div>generation: <span id="generation">0</span> (next: <span id="next_generation">0</span> games)</div>
+        <input type="range" min="0" max="200" value="18" class="slider" id="game_rate" onchange="updateGameRate(this.value)">
+        <br>
+        <label style="display: inline;" for="upload-json">upload model.json: </label><input name="upload-json" type="file" id="upload-json"/><br>
+        <label style="display: inline;" for="upload-weights">upload weights.bin file: </label><input name="upload-weights" type="file" id="upload-weights"/>
+        <br>
+        <input type="checkbox" id="autosave" name="autosave" checked><label for="autosave"> AutoSave best snakes</label>
+        <br><br>
+        <button type="button" onclick="loadBrainFiles()">Load brain files</button>
+        <button type="button" onclick="resetGame()">train new AI</button>
+        <button type="button" onclick="resetGame('human')">play Human</button>
+
+    </div>
+</body>
+
+<style>
+    .slider{
+        width: 300px;;
+    }
+</style>
+
+</html>
