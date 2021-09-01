@@ -1,6 +1,0 @@
-{
-    "model": "{\"class_name\":\"Sequential\",\"config\":{\"name\":\"sequential_253\",\"layers\":[{\"class_name\":\"Dense\",\"config\":{\"units\":120,\"activation\":\"sigmoid\",\"use_bias\":true,\"kernel_initializer\":{\"class_name\":\"VarianceScaling\",\"config\":{\"scale\":1,\"mode\":\"fan_avg\",\"distribution\":\"normal\",\"seed\":null}},\"bias_initializer\":{\"class_name\":\"Zeros\",\"config\":{}},\"kernel_regularizer\":null,\"bias_regularizer\":null,\"activity_regularizer\":null,\"kernel_constraint\":null,\"bias_constraint\":null,\"name\":\"dense_Dense505\",\"trainable\":true,\"batch_input_shape\":[null,12],\"dtype\":\"float32\"}},{\"class_name\":\"Dense\",\"config\":{\"units\":4,\"activation\":\"softmax\",\"use_bias\":true,\"kernel_initializer\":{\"class_name\":\"VarianceScaling\",\"config\":{\"scale\":1,\"mode\":\"fan_avg\",\"distribution\":\"normal\",\"seed\":null}},\"bias_initializer\":{\"class_name\":\"Zeros\",\"config\":{}},\"kernel_regularizer\":null,\"bias_regularizer\":null,\"activity_regularizer\":null,\"kernel_constraint\":null,\"bias_constraint\":null,\"name\":\"dense_Dense506\",\"trainable\":true}}]},\"keras_version\":\"tfjs-layers 2.0.0\",\"backend\":\"tensor_flow.js\"}",
-    "input_nodes": 12,
-    "hidden_nodes": 120,
-    "output_nodes": 4
-}
