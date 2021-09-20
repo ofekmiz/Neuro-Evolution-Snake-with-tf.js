@@ -16,29 +16,103 @@
     <script src="game.js"></script>
     <div>
         <canvas id="snake_game" onclick="getMousePos(event)"></canvas>
-        <div>life: <span id="life">0</span></div>
-        <div>score: <span id="score">0</span></div>
-        <div>best score: <span id="best_score">0</span></div>
-        <div>total games: <span id="games">0</span></div>
-        <div>generation: <span id="generation">0</span> (next: <span id="next_generation">0</span> games)</div>
-        <input type="range" min="0" max="200" value="18" class="slider" id="game_rate" onchange="updateGameRate(this.value)">
-        <br>
-        <label style="display: inline;" for="upload-json">upload model.json: </label><input name="upload-json" type="file" id="upload-json"/><br>
-        <label style="display: inline;" for="upload-weights">upload weights.bin file: </label><input name="upload-weights" type="file" id="upload-weights"/>
-        <br>
-        <input type="checkbox" id="autosave" name="autosave" checked><label for="autosave"> AutoSave best snakes</label>
-        <br><br>
-        <button type="button" onclick="loadBrainFiles()">Load brain files</button>
-        <button type="button" onclick="loadTrainedBrain()">run trained AI</button>
-        <button type="button" onclick="resetGame()">train new AI</button>
-        <button type="button" onclick="resetGame('human')">play Human</button>
+        <canvas id="visual_network"></canvas>
+        <span class="game_setup_wrapper_1">
+            <div>Steps left: <span id="life">0</span></div>
+            <div>Score: <span id="score">0</span></div>
+            <div>Best score: <span id="best_score">0</span></div>
+            <div>Total games: <span id="games">0</span></div>
+            <div>Generation: <span id="generation">0</span> (next: <span id="next_generation">0</span> games)</div>
+            <div>Speed: <input type="range" min="0" max="200" value="15" class="slider" id="game_rate"
+                    onchange="updateGameRate(this.value)">
+                <button id="game_rate_reset" type="button" onclick="resetRate()"><svg xmlns="http://www.w3.org/2000/svg"
+                        width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise"
+                        viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z" />
+                        <path
+                            d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z" />
+                    </svg></button>
+            </div>
+            <input type="checkbox" id="autosave" name="autosave" checked><label for="autosave"> AutoSave best
+                snakes</label>
+            <br>
+            <input type="checkbox" id="enable_walls" name="enable_walls" checked onchange="toggleWalls()"><label
+                for="enable_walls"> Enable walls</label>
+        </span>
+        <hr>
+        <span class="game_setup_wrapper_2">
+            <label for="total_snakes">Snakes in generation: </label>
+            <input type="number" id="total_snakes" name="total_snakes" min="1">
+            <button type="button" onclick="loadTrainedBrain()">Run trained AI</button>
+            <button type="button" onclick="resetGame()">Train new AI</button>
+            <button type="button" onclick="resetGame('human')">Play Human</button>
+            <br>
+            <table class="load_files_box">
+                <tr>
+                    <td> <button type="button" onclick="loadBrainFiles()">Load brain files</button></td>
+                    <td>
+                        <label style="display: inline;" for="upload-json"><b>model.json</b> file: </label>
+                        <input name="upload-json" type="file" id="upload-json" /><br>
+                        <label style="display: inline;" for="upload-weights"><b>weights.bin</b> file: </label>
+                        <input name="upload-weights" type="file" id="upload-weights" />
+                    </td>
+                </tr>
+            </table>
+        </span>
 
     </div>
 </body>
 
 <style>
-    .slider{
-        width: 300px;;
+    .game_setup_wrapper_1,
+    .game_setup_wrapper_2 {
+        line-height: 28px;
+    }
+
+    table {
+        margin-top: 10px;
+        border-radius: 5px;
+        background-color: #ccc;
+        width: 550px;
+        text-align: center;
+    }
+
+    td {
+        border: 1px solid gray;
+        text-align: center;
+    }
+
+
+    #game_rate_reset {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 100px;
+        height: 20px;
+        width: 20px;
+        padding: 2px;
+        vertical-align: middle;
+    }
+
+    .slider {
+        width: 300px;
+        vertical-align: middle;
+    }
+
+    #total_snakes {
+        max-width: 50px;
+    }
+
+    #visual_network {
+        padding: 10px;
+    }
+
+    #snake_game {
+        border: 5px solid white;
+    }
+
+    #snake_game.walls {
+        border-color: gray;
     }
 </style>
 

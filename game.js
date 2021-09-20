@@ -1,15 +1,17 @@
-const CANVAS_SIZE = 400;
-const GRID_SIZE = 20;
-const TILE_COUNT = CANVAS_SIZE / GRID_SIZE;
+const CANVAS_SIZE = 400; //size of canvas in px
+const TILE_SIZE = 20; //size of each tile in px
+const TILE_COUNT = CANVAS_SIZE / TILE_SIZE; //number of tiles in each row
+const INITIAL_RATE = 12;
 
-let total_snakes_in_generation = 30;
 let human_player = false;
-let walls = false;
+let walls = true;
 
 /** @type {Array.<Snake>} */
 let snakes = [];
 let current_snake;
 let savedSnakes = [];
+let total_snakes_in_generation = 1200;
+
 let canvas;
 /** @type {CanvasRenderingContext2D} */
 let ctx;
@@ -21,13 +23,10 @@ let games;
 let generation;
 let autosave;
 
-//SETUP
+//LOAD SETUP
 window.onload = function () {
-    setup();
-    newGame();
-}
-
-function setup(brain) {
+    total_snakes_input = document.getElementById("total_snakes");
+    total_snakes_input.value = total_snakes_in_generation;
     rate_slider = document.getElementById("game_rate");
     canvas = document.getElementById("snake_game");
     autosave = document.getElementById("autosave");
@@ -35,9 +34,23 @@ function setup(brain) {
     canvas.width = CANVAS_SIZE;
     ctx = canvas.getContext("2d");
     document.addEventListener("keydown", keyDown);
+
+    setup();
+    newGame();
+}
+
+function setup(brain) {
     best_score = 0;
     games = 0;
     generation = 0;
+
+    //dispose leftover snakes
+    for (let i = 0; i < savedSnakes.length; i++) {
+        savedSnakes[i].dispose();
+    }
+    savedSnakes = [];
+    total_snakes_in_generation = total_snakes_input.value;
+
     if (human_player) {
         snakes[0] = new Snake("human");
     } else {
@@ -49,27 +62,53 @@ function setup(brain) {
             }
         }
     }
-    updateGameRate(rate_slider.value);
+    resetRate();
 }
 
+
 function newGame() {
-    apple = { x: 14, y: 15 };
     if (human_player) {
         snakes[0] = new Snake("human");
     }
+    current_snake = snakes[0];
+    toggleWalls();
+    appleRandomPosition();
+}
+
+function appleRandomPosition() {
+    let apple_x = getRandomInt(1, TILE_COUNT - 1);
+    let apple_y = getRandomInt(1, TILE_COUNT - 1);
+    while (apple_x == current_snake.x && apple_y == current_snake.y) {
+        apple_x = getRandomInt(1, TILE_COUNT - 1);
+        apple_y = getRandomInt(1, TILE_COUNT - 1);
+    }
+    apple = { x: apple_x, y: apple_y };
 }
 
 function resetGame(human) {
     human_player = human;
-    rate_slider.value = 18;
     setup();
     newGame();
 }
 
+function resetRate() {
+    rate_slider.value = INITIAL_RATE;
+    updateGameRate(INITIAL_RATE);
+}
+
+function toggleWalls() {
+    var walls_check = document.getElementById("enable_walls").checked;
+    if (walls_check) {
+        walls = true;
+        canvas.classList.add("walls");
+    } else {
+        walls = false;
+        canvas.classList.remove("walls");
+    }
+}
 //GAME LOOP
 function gameLoop() {
 
-    current_snake = snakes[0];
     let hit_wall = false;
     document.getElementById("life").innerHTML = current_snake.life;
     document.getElementById("score").innerHTML = current_snake.score;
@@ -81,26 +120,28 @@ function gameLoop() {
     current_snake.x += current_snake.x_velocity;
     current_snake.y += current_snake.y_velocity;
 
+    //Hit walls
     if (current_snake.x < 0) {
         if (walls) {
             hit_wall = true;
+            current_snake.hit_wall = true;
         } else {
             current_snake.x = TILE_COUNT - 1;
         }
-        current_snake.wall_hits++;
     }
 
     if (current_snake.x > TILE_COUNT - 1) {
         if (walls) {
             hit_wall = true;
+            current_snake.hit_wall = true;
         } else {
             current_snake.x = 0;
         }
-        current_snake.wall_hits++;
     }
     if (current_snake.y < 0) {
         if (walls) {
             hit_wall = true;
+            current_snake.hit_wall = true;
         } else {
             current_snake.y = TILE_COUNT - 1;
         }
@@ -109,10 +150,10 @@ function gameLoop() {
     if (current_snake.y > TILE_COUNT - 1) {
         if (walls) {
             hit_wall = true;
+            current_snake.hit_wall = true;
         } else {
             current_snake.y = 0;
         }
-        current_snake.wall_hits++;
     }
 
     //Draw black board
@@ -122,7 +163,7 @@ function gameLoop() {
     //Draw snake tail
     ctx.fillStyle = "lime";
     for (var i = 0; i < current_snake.trail.length; i++) {
-        ctx.fillRect(current_snake.trail[i].x * GRID_SIZE, current_snake.trail[i].y * GRID_SIZE, GRID_SIZE - 2, GRID_SIZE - 2);
+        ctx.fillRect(current_snake.trail[i].x * TILE_SIZE, current_snake.trail[i].y * TILE_SIZE, TILE_SIZE - 2, TILE_SIZE - 2);
 
         //End Game
         if (hit_wall || (current_snake.life <= 0 && !human_player) || (current_snake.trail[i].x == current_snake.x && current_snake.trail[i].y == current_snake.y && (current_snake.x_velocity != 0 || current_snake.y_velocity != 0))) {
@@ -133,10 +174,11 @@ function gameLoop() {
             }
 
             if (!human_player) {
-                savedSnakes.push(snakes.splice(0, 1)[0]); //splice for deep copy
+                savedSnakes.push(snakes.splice(0, 1)[0]); //remove the current snake from snakes and put it in savedSnakes
                 //Next Generation
                 if (savedSnakes.length == total_snakes_in_generation) {
                     generation++;
+                    updateGameRate(rate_slider.value);
                     nextGeneration();
                 }
             }
@@ -171,15 +213,16 @@ function gameLoop() {
 
     //draw new apple
     ctx.fillStyle = "red";
-    ctx.fillRect(apple.x * GRID_SIZE, apple.y * GRID_SIZE, GRID_SIZE - 2, GRID_SIZE - 2);
+    ctx.fillRect(apple.x * TILE_SIZE, apple.y * TILE_SIZE, TILE_SIZE - 2, TILE_SIZE - 2);
     if (!human_player) {
-        current_snake.think();
+        current_snake.think(true);
         current_snake.update();
     }
 }
 
 function keyDown(e) {
-    if (human_player) {
+    if (human_player && document.activeElement === document.body) {
+        e.preventDefault(); //prevent scroll with arrows
         if (e.keyCode == '38') {
             // up arrow
             snakes[0].up();
@@ -204,21 +247,26 @@ function keyDown(e) {
 
 function updateGameRate(rate) {
     if (typeof game_loop_interval !== 'undefined') clearInterval(game_loop_interval);
-    if (rate > 0) game_loop_interval = setInterval(gameLoop, 1000 / rate);
+    if (rate > 0) {
+        setTimeout(function () { game_loop_interval = setInterval(gameLoop, 1000 / rate); }, 300);
+    }
 }
 
 function getMousePos(evt) {
     var rect = canvas.getBoundingClientRect();
     result = {
-        x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
-        y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
+        x: ((evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width) / TILE_COUNT,
+        y: ((evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height) / TILE_COUNT
     };
     console.log(result);
     return result;
 }
 
 async function downloadBrainFiles(snake, fileName) {
-    await snake.brain.model.save('downloads://' + fileName);
+    var today = new Date();
+    var time = today.getHours() + "_" + today.getMinutes() + "_" + today.getSeconds();
+    var date = today.getFullYear() + '_' + (today.getMonth() + 1) + '_' + today.getDate();
+    await snake.brain.model.save('downloads://' + fileName + "(" + time + ")(" + date + ")");
 }
 
 async function loadBrainFiles() {
@@ -228,16 +276,18 @@ async function loadBrainFiles() {
         const model = await tf.loadLayersModel(
             tf.io.browserFiles([jsonUpload.files[0], weightsUpload.files[0]]));
         let brain = new NeuralNetwork(model, Snake.INPUT_NODES, Snake.HIDDEN_NODES, Snake.OUTPUT_NODES);
+        human_player = false;
         setup(brain);
         newGame();
     } catch (error) {
-        console.log("Brain files Not supported, please use the right json & bin files");
+        console.log(error);
+        alert("Couldn't load files");
     }
 }
 
-async function loadTrainedBrain(){
+async function loadTrainedBrain() {
     try {
-        const model = await tf.loadLayersModel('https://raw.githubusercontent.com/ofekmiz/Neuro-Evolution-Snake-with-tf.js/main/snake_brains/snake_gen_13_score_40_walls_false.json');
+        const model = await tf.loadLayersModel('https://raw.githubusercontent.com/ofekmiz/Neuro-Evolution-Snake-with-tf.js/main/snake_brains/snake_gen_74_score_59_walls_false.json');
         let brain = new NeuralNetwork(model, Snake.INPUT_NODES, Snake.HIDDEN_NODES, Snake.OUTPUT_NODES);
         setup(brain);
         newGame();
@@ -245,6 +295,30 @@ async function loadTrainedBrain(){
     } catch (error) {
         console.log(error);
     }
+}
+
+/**
+ * Returns a random integer between min (inclusive) and max (inclusive).
+ * The value is no lower than min (or the next integer greater than min
+ * if min isn't an integer) and no greater than max (or the next integer
+ * lower than max if max isn't an integer).
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// v is the number of times random is summed and should be over >= 1
+// return a random number between 0-1 exclusive
+//https://riptutorial.com/javascript/example/8330/random--with-gaussian-distribution
+function randomGaussian(v) {
+    var r = 0;
+    for (var i = v; i > 0; i--) {
+        r += Math.random();
+    }
+    return r / v;
 }
 
 

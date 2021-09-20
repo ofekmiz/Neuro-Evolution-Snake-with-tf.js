@@ -6,13 +6,8 @@ function nextGeneration() {
   let best_snake = pickBestSnake();
   for (let i = 0; i < total_snakes_in_generation; i++) {
     snakes[i] = new Snake(best_snake.brain);
-    if (Math.random() >= 0.3) snakes[i].mutate();
+    if (Math.random() >= 0.3) snakes[i].mutate(0.1);
   }
-
-  for (let i = 0; i < total_snakes_in_generation; i++) {
-    savedSnakes[i].dispose();
-  }
-  savedSnakes = [];
 
   console.log("--------------------");
   console.log("next generation");
@@ -20,6 +15,11 @@ function nextGeneration() {
   console.log("best score:" + best_snake.score);
   console.log("best fitness:" + best_snake.fitness);
 
+  //dispose old snakes
+  for (let i = 0; i < total_snakes_in_generation; i++) {
+    savedSnakes[i].dispose();
+  }
+  savedSnakes = [];
 }
 
 function pickBestSnake() {
@@ -31,14 +31,8 @@ function pickBestSnake() {
 }
 
 function calculateFitness() {
-  let best_fitness = 0;
-  let best_score = 0;
-
   for (let snake of savedSnakes) {
-    snake.fitness = snake.score * 5000 - snake.wall_hits * 40 - snake.life * 10;
-    if (snake.fitness > best_fitness) {
-      best_fitness = snake.fitness;
-      best_score = snake.score;
-    }
+    wall_penalty = snake.hit_wall ? 1000 : 0;
+    snake.fitness = snake.score * 2000 + snake.steps * 10 - wall_penalty;
   }
 }

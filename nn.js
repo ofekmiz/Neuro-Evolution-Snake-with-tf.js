@@ -44,7 +44,7 @@ class NeuralNetwork {
         for (let j = 0; j < values.length; j++) {
           if (Math.random() < rate) {
             let w = values[j];
-            values[j] = w + this.randomGaussian(6);
+            values[j] = w + randomGaussian(6);
           }
         }
         let newTensor = tf.tensor(values, shape);
@@ -63,7 +63,6 @@ class NeuralNetwork {
       const xs = tf.tensor2d([inputs]);
       const ys = this.model.predict(xs);
       const outputs = ys.dataSync();
-      // console.log(outputs);
       return outputs;
     });
   }
@@ -83,15 +82,6 @@ class NeuralNetwork {
     model.add(output);
     return model;
   }
-
-  // v is the number of times random is summed and should be over >= 1
-  // return a random number between 0-1 exclusive
-  //https://riptutorial.com/javascript/example/8330/random--with-gaussian-distribution
-  randomGaussian(v) {
-    var r = 0;
-    for (var i = v; i > 0; i--) {
-      r += Math.random();
-    }
-    return r / v;
-  }
 }
+
+
