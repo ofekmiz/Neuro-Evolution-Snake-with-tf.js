@@ -3,6 +3,13 @@ const TILE_SIZE = 20; //size of each tile in px
 const TILE_COUNT = CANVAS_SIZE / TILE_SIZE; //number of tiles in each row
 const INITIAL_RATE = 12;
 
+let canvas;
+/** @type {CanvasRenderingContext2D} */
+let ctx;
+let rate_slider;
+let visualNetworkCanvas
+let total_snakes_input;
+
 let human_player = false;
 let walls = true;
 
@@ -11,11 +18,6 @@ let snakes = [];
 let current_snake;
 let savedSnakes = [];
 let total_snakes_in_generation = 1200;
-
-let canvas;
-/** @type {CanvasRenderingContext2D} */
-let ctx;
-let rate_slider;
 let game_loop_interval;
 let apple;
 let best_score;
@@ -23,8 +25,10 @@ let games;
 let generation;
 let autosave;
 
+
 //LOAD SETUP
 window.onload = function () {
+    visualNetworkCanvas = document.getElementById("visual_network");
     total_snakes_input = document.getElementById("total_snakes");
     total_snakes_input.value = total_snakes_in_generation;
     rate_slider = document.getElementById("game_rate");
@@ -51,9 +55,13 @@ function setup(brain) {
     savedSnakes = [];
     total_snakes_in_generation = total_snakes_input.value;
 
+    //human player
     if (human_player) {
         snakes[0] = new Snake("human");
-    } else {
+        visualNetworkCanvas.classList.add("hidden");
+    }
+    //AI
+    else {
         for (let i = 0; i < total_snakes_in_generation; i++) {
             if (brain) {
                 snakes[i] = new Snake(brain);
@@ -61,7 +69,9 @@ function setup(brain) {
                 snakes[i] = new Snake();
             }
         }
+        visualNetworkCanvas.classList.remove("hidden");
     }
+
     resetRate();
 }
 
@@ -241,7 +251,7 @@ function keyDown(e) {
         }
     } else if (e.keyCode == '83') {
         // pressd 'S'
-        downloadBrainFiles(current_snake, 'snake_gen_' + generation + '_score_' + current_snake.score + '_walls_' + walls);
+        downloadCurrentBrain();
     }
 }
 
@@ -262,6 +272,10 @@ function getMousePos(evt) {
     return result;
 }
 
+function downloadCurrentBrain() {
+    downloadBrainFiles(current_snake, 'snake_gen_' + generation + '_score_' + current_snake.score + '_walls_' + walls);
+}
+
 async function downloadBrainFiles(snake, fileName) {
     var today = new Date();
     var time = today.getHours() + "_" + today.getMinutes() + "_" + today.getSeconds();
@@ -275,7 +289,7 @@ async function loadBrainFiles() {
     try {
         const model = await tf.loadLayersModel(
             tf.io.browserFiles([jsonUpload.files[0], weightsUpload.files[0]]));
-        let brain = new NeuralNetwork(model, Snake.INPUT_NODES, Snake.HIDDEN_NODES, Snake.OUTPUT_NODES);
+        let brain = new NeuralNetwork(model, Snake.INPUT_NODES, Snake.HIDDEN_NODES_1, Snake.HIDDEN_NODES_2, Snake.OUTPUT_NODES);
         human_player = false;
         setup(brain);
         newGame();
@@ -288,7 +302,7 @@ async function loadBrainFiles() {
 async function loadTrainedBrain() {
     try {
         const model = await tf.loadLayersModel('https://raw.githubusercontent.com/ofekmiz/Neuro-Evolution-Snake-with-tf.js/main/snake_brains/snake_gen_74_score_59_walls_false.json');
-        let brain = new NeuralNetwork(model, Snake.INPUT_NODES, Snake.HIDDEN_NODES, Snake.OUTPUT_NODES);
+        let brain = new NeuralNetwork(model, Snake.INPUT_NODES, Snake.HIDDEN_NODES_1, Snake.HIDDEN_NODES_2, Snake.OUTPUT_NODES);
         setup(brain);
         newGame();
         generation = 74;

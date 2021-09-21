@@ -33,6 +33,6 @@ function pickBestSnake() {
 function calculateFitness() {
   for (let snake of savedSnakes) {
     wall_penalty = snake.hit_wall ? 1000 : 0;
-    snake.fitness = snake.score * 2000 + snake.steps * 10 - wall_penalty;
+    snake.fitness = snake.score * 2000 + snake.steps * 20 - wall_penalty;
   }
 }

@@ -2,7 +2,8 @@
 class Snake {
     static FULL_LIFE = 100;
     static INPUT_NODES = 12;
-    static HIDDEN_NODES = 8;
+    static HIDDEN_NODES_1 = 8;
+    static HIDDEN_NODES_2 = 8;
     static OUTPUT_NODES = 4;
     static RANDOM_OUTPUT_TRESHOLD = 0;
     constructor(brain) {
@@ -21,7 +22,7 @@ class Snake {
             if (brain) {
                 this.brain = brain.copy();
             } else {
-                this.brain = new NeuralNetwork(Snake.INPUT_NODES, Snake.HIDDEN_NODES, Snake.OUTPUT_NODES);
+                this.brain = new NeuralNetwork(Snake.INPUT_NODES, Snake.HIDDEN_NODES_1, Snake.HIDDEN_NODES_2, Snake.OUTPUT_NODES);
             }
         }
     }
@@ -76,7 +77,6 @@ class Snake {
         }
     }
 
-    /**@param drawVisualNetwork: boolean */
     think(drawVisualNetwork) {
 
         const WALL_DISTANCE_FAR = 0.5;
@@ -120,80 +120,20 @@ class Snake {
             this.right();
         }
 
-        if (drawVisualNetwork) {
-            this.drawVisualBrainNetwork(document.getElementById("visual_network"), inputs, output, max_output_index);
-        }
+        //Draw visual network
+        if (drawVisualNetwork) this.displayVisualBrainNetwork(inputs, output, max_output_index);
+
+    }
+
+    displayVisualBrainNetwork(inputs, output, max_output_index) {
+        const visualNetworkCanvas = document.getElementById("visual_network");
+        const OUTPUT_LABELS = ["Up", "Down", "Left", "Right"];
+        const INPUT_LABELS = ["direction down", "direction up", "direction right", "direction left", "apple left", "apple right", "apple up", "apple down", "wall up", "wall down", "wall left", "wall right"];
+        drawVisualNetwork(visualNetworkCanvas, inputs, output, INPUT_LABELS, OUTPUT_LABELS, max_output_index);
     }
 
     update() {
         this.life--;
         this.steps++;
-    }
-
-    drawVisualBrainNetwork(canvas, inputs, outputs, max_output_index) {
-        const CANVAS_SIZE = 400;
-        const NODE_RADIUS = 10;
-        const NODE_SPACING = 25;
-        const OUTPUT_LABELS = ["Up", "Down", "Left", "Right"];
-        const INPUT_LABELS = ["direction down", "direction up", "direction right", "direction left", "apple left", "apple right", "apple up", "apple down", "wall up", "wall down", "wall left", "wall right"];
-        canvas.height = CANVAS_SIZE;
-        canvas.width = CANVAS_SIZE;
-        /** @type {CanvasRenderingContext2D} */
-        var ctx = canvas.getContext("2d");
-
-        function drawCircle(center_x, center_y, radius, color, text) {
-            ctx.beginPath();
-            ctx.strokeStyle = "black"
-            ctx.arc(center_x, center_y, radius, 0, 2 * Math.PI);
-            ctx.fillStyle = color;
-            ctx.stroke();
-            ctx.fill();
-            ctx.fillStyle = "black";
-            ctx.font = "12px Arial";
-            if (typeof text != "undefined") ctx.fillText(text, center_x, center_y + 2, radius * 2);
-            ctx.closePath();
-        }
-
-        //Draw Inputs
-        for (var i = 0; i < Snake.INPUT_NODES; i++) {
-            var color = inputs[i] == 1 ? "green" : inputs[i] == 0.5 ? "mediumseagreen" : inputs[i] == 0.25 ? "lightgreen" : "gray";
-            drawCircle(100, CANVAS_SIZE / 2 - NODE_SPACING * Snake.INPUT_NODES / 2 + NODE_SPACING * i, NODE_RADIUS, color);
-            //Draw label
-            ctx.beginPath();
-            ctx.textAlign = "right";
-            ctx.fillStyle = (i < 4) ? "blue" : (i < 8) ? "olive" : ("darkred");
-            ctx.fillText(INPUT_LABELS[i], 80, CANVAS_SIZE / 2 - NODE_SPACING * Snake.INPUT_NODES / 2 + NODE_SPACING * i + NODE_RADIUS / 2);
-            ctx.closePath();
-        }
-
-        //Draw Hidden Layer
-        ctx.beginPath();
-        var rectWidth = 70
-        var rectY = CANVAS_SIZE / 2 - NODE_SPACING * Snake.INPUT_NODES / 2 - NODE_SPACING / 2;
-        var rectX = 140;
-        var rectHeight = NODE_SPACING * Snake.INPUT_NODES;
-        var textLineSpace = 20;
-        ctx.rect(rectX, rectY, rectWidth, rectHeight);
-        ctx.fillStyle = "gray"
-        ctx.strokeStyle = "gray"
-        ctx.font = "14px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("Hidden", rectX + (rectWidth / 2), rectY + (rectHeight / 2) - textLineSpace, rectWidth);
-        ctx.fillText("Layer", rectX + (rectWidth / 2), rectY + (rectHeight / 2), rectWidth);
-        ctx.fillText("(" + Snake.HIDDEN_NODES + ")", rectX + (rectWidth / 2), rectY + (rectHeight / 2) + + textLineSpace, rectWidth);
-        ctx.stroke();
-        ctx.closePath();
-
-        //Draw Outputs
-        for (var i = 0; i < Snake.OUTPUT_NODES; i++) {
-            var color = (i == max_output_index && outputs[i] <= Snake.RANDOM_OUTPUT_TRESHOLD) ? "blue" : (i == max_output_index && outputs[i] < 0.7) ? "lightgreen" : (i == max_output_index) ? "green" : "gray";
-            drawCircle(250, CANVAS_SIZE / 2 - NODE_SPACING * 2 * Snake.OUTPUT_NODES / 2 + NODE_SPACING * 2 * i, NODE_RADIUS * 2, color, parseFloat(outputs[i]).toFixed(2));
-            //Draw label
-            ctx.beginPath();
-            ctx.fillText(OUTPUT_LABELS[i], 300, CANVAS_SIZE / 2 - NODE_SPACING * 2 * Snake.OUTPUT_NODES / 2 + NODE_SPACING * 2 * i);
-            ctx.closePath();
-        }
-
     }
 }

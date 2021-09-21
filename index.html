@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <title>Snake NeuroEvolution with tf.js</title>
 </head>
 
@@ -14,7 +16,8 @@
     <script src="ga.js"></script>
     <script src="snake.js"></script>
     <script src="game.js"></script>
-    <div>
+    <script src="visualNetwork.js"></script>
+    <div id="main_container">
         <canvas id="snake_game" onclick="getMousePos(event)"></canvas>
         <canvas id="visual_network"></canvas>
         <span class="game_setup_wrapper_1">
@@ -25,19 +28,20 @@
             <div>Generation: <span id="generation">0</span> (next: <span id="next_generation">0</span> games)</div>
             <div>Speed: <input type="range" min="0" max="200" value="15" class="slider" id="game_rate"
                     onchange="updateGameRate(this.value)">
-                <button id="game_rate_reset" type="button" onclick="resetRate()"><svg xmlns="http://www.w3.org/2000/svg"
-                        width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise"
-                        viewBox="0 0 16 16">
+                <button id="game_rate_reset" type="button" onclick="resetRate()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z" />
                         <path
                             d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z" />
-                    </svg></button>
+                    </svg>
+                </button>
             </div>
-            <input type="checkbox" id="autosave" name="autosave" checked><label for="autosave"> AutoSave best
+            <input type="checkbox" id="autosave" name="autosave" checked><label for="autosave">&nbsp;AutoSave best
                 snakes</label>
             <br>
             <input type="checkbox" id="enable_walls" name="enable_walls" checked onchange="toggleWalls()"><label
-                for="enable_walls"> Enable walls</label>
+                for="enable_walls">&nbsp;Enable walls</label>
         </span>
         <hr>
         <span class="game_setup_wrapper_2">
@@ -49,39 +53,79 @@
             <br>
             <table class="load_files_box">
                 <tr>
-                    <td> <button type="button" onclick="loadBrainFiles()">Load brain files</button></td>
+                    <td> <button type="button" onclick="loadBrainFiles()">Load brain files</button><button type="button"
+                            onclick="downloadCurrentBrain()">Download current brain</button></td>
                     <td>
-                        <label style="display: inline;" for="upload-json"><b>model.json</b> file: </label>
+                        <label style="display: inline;" for="upload-json"><b>model.json</b>: </label>
                         <input name="upload-json" type="file" id="upload-json" /><br>
-                        <label style="display: inline;" for="upload-weights"><b>weights.bin</b> file: </label>
+                        <label style="display: inline;" for="upload-weights"><b>weights.bin</b>: </label>
                         <input name="upload-weights" type="file" id="upload-weights" />
                     </td>
                 </tr>
             </table>
         </span>
-
     </div>
+    <div>Made By Ofek Mizrahi (c) 2021 <a><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+                <path
+                    d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+            </svg></a></div>
 </body>
 
 <style>
+    body {
+        background-color: #e9ecef;
+        padding: 20px;
+    }
+
+    .game_setup_wrapper_1 label {
+        margin-bottom: 0;
+    }
+
     .game_setup_wrapper_1,
     .game_setup_wrapper_2 {
-        line-height: 28px;
+        line-height: 30px;
+    }
+
+    .game_setup_wrapper_1 {
+        display: block;
+        width: 600px;
+        margin: auto;
+        text-align: left;
+        margin-top: 15px;
+    }
+
+    #main_container {
+        text-align: center;
+    }
+
+    #life {
+        width: 25px;
+        display: inline-block;
     }
 
     table {
+        margin: auto;
         margin-top: 10px;
         border-radius: 5px;
         background-color: #ccc;
-        width: 550px;
+        width: 600px;
         text-align: center;
+
+    }
+
+    table button {
+        width: 180px;
+        display: block;
+        margin-top: 5px !important;
     }
 
     td {
         border: 1px solid gray;
         text-align: center;
+        padding: 10px;
+        font-size: 14px;
     }
-
 
     #game_rate_reset {
         display: inline-flex;
@@ -94,13 +138,18 @@
         vertical-align: middle;
     }
 
+    .game_setup_wrapper_2 button,
+    .game_setup_wrapper_2 input {
+        margin: 2px;
+    }
+
     .slider {
         width: 300px;
         vertical-align: middle;
     }
 
     #total_snakes {
-        max-width: 50px;
+        max-width: 60px;
     }
 
     #visual_network {
@@ -113,6 +162,10 @@
 
     #snake_game.walls {
         border-color: gray;
+    }
+
+    .hidden {
+        display: none;
     }
 </style>
 

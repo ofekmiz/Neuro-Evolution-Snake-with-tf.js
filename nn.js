@@ -1,16 +1,18 @@
 // Neuro-Evolution Snake with TensorFlow.js
 
 class NeuralNetwork {
-  constructor(a, b, c, d) {
+  constructor(a, b, c, d, e) {
     if (a instanceof tf.Sequential) {
       this.model = a;
       this.input_nodes = b;
-      this.hidden_nodes = c;
-      this.output_nodes = d;
+      this.hidden_nodes_1 = c;
+      this.hidden_nodes_2 = d;
+      this.output_nodes = e;
     } else {
       this.input_nodes = a;
-      this.hidden_nodes = b;
-      this.output_nodes = c;
+      this.hidden_nodes_1 = b;
+      this.hidden_nodes_2 = c;
+      this.output_nodes = d;
       this.model = this.createModel();
     }
   }
@@ -27,7 +29,8 @@ class NeuralNetwork {
       return new NeuralNetwork(
         modelCopy,
         this.input_nodes,
-        this.hidden_nodes,
+        this.hidden_nodes_1,
+        this.hidden_nodes_2,
         this.output_nodes
       );
     });
@@ -69,12 +72,18 @@ class NeuralNetwork {
 
   createModel() {
     const model = tf.sequential();
-    const hidden = tf.layers.dense({
-      units: this.hidden_nodes,
+    const hidden_1 = tf.layers.dense({
+      units: this.hidden_nodes_1,
       inputShape: [this.input_nodes],
       activation: 'sigmoid'
     });
-    model.add(hidden);
+    model.add(hidden_1);
+    const hidden_2 = tf.layers.dense({
+      units: this.hidden_nodes_2,
+      inputShape: [this.hidden_nodes_1],
+      activation: 'sigmoid'
+    });
+    model.add(hidden_2);
     const output = tf.layers.dense({
       units: this.output_nodes,
       activation: 'softmax'
