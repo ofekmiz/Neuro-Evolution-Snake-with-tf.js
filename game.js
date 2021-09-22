@@ -7,8 +7,9 @@ let canvas;
 /** @type {CanvasRenderingContext2D} */
 let ctx;
 let rate_slider;
-let visualNetworkCanvas
 let total_snakes_input;
+let graph_canvas;
+let visual_network_canvas;
 
 let human_player = false;
 let walls = true;
@@ -17,20 +18,22 @@ let walls = true;
 let snakes = [];
 let current_snake;
 let savedSnakes = [];
-let total_snakes_in_generation = 1200;
+let total_snakes_in_generation = 800;
 let game_loop_interval;
 let apple;
 let best_score;
 let games;
 let generation;
 let autosave;
+let generationData;
 
 
 //LOAD SETUP
 window.onload = function () {
-    visualNetworkCanvas = document.getElementById("visual_network");
     total_snakes_input = document.getElementById("total_snakes");
     total_snakes_input.value = total_snakes_in_generation;
+    graph_canvas = document.getElementById("lineChart");
+    visual_network_canvas = document.getElementById("visual_network");
     rate_slider = document.getElementById("game_rate");
     canvas = document.getElementById("snake_game");
     autosave = document.getElementById("autosave");
@@ -47,21 +50,29 @@ function setup(brain) {
     best_score = 0;
     games = 0;
     generation = 0;
-
-    //dispose leftover snakes
-    for (let i = 0; i < savedSnakes.length; i++) {
-        savedSnakes[i].dispose();
-    }
-    savedSnakes = [];
-    total_snakes_in_generation = total_snakes_input.value;
+    generationData = { score: [], fitness: [], avg_score: [] };
+    drawNetworkGraph(graph_canvas, generationData.score, generationData.fitness, generationData.avg_score);
+    showVisualNetwork();
 
     //human player
     if (human_player) {
         snakes[0] = new Snake("human");
-        visualNetworkCanvas.classList.add("hidden");
+        document.getElementById("visual_data").classList.add("hidden");
     }
     //AI
     else {
+        //Dispose old snakes
+        for (let i = 0; i < savedSnakes.length; i++) {
+            savedSnakes[i].dispose();
+        }
+        for (let i = 0; i < snakes.length; i++) {
+            if (snakes[i].brain) snakes[i].dispose();
+        }
+        savedSnakes = [];
+        snakes = [];
+        total_snakes_in_generation = total_snakes_input.value;
+
+        //New Snakes population
         for (let i = 0; i < total_snakes_in_generation; i++) {
             if (brain) {
                 snakes[i] = new Snake(brain);
@@ -69,7 +80,7 @@ function setup(brain) {
                 snakes[i] = new Snake();
             }
         }
-        visualNetworkCanvas.classList.remove("hidden");
+        document.getElementById("visual_data").classList.remove("hidden");
     }
 
     resetRate();
@@ -309,6 +320,21 @@ async function loadTrainedBrain() {
     } catch (error) {
         console.log(error);
     }
+}
+
+function showVisualNetwork() {
+    var buttons = document.querySelectorAll('.visual_data_menu button');
+    buttons.forEach(element => element.classList.remove("chosen"));
+    buttons[0].classList.add("chosen");
+    visual_network_canvas.classList.remove("hidden");
+    graph_canvas.classList.add("hidden");
+}
+function showGraph() {
+    var buttons = document.querySelectorAll('.visual_data_menu button');
+    buttons.forEach(element => element.classList.remove("chosen"));
+    buttons[1].classList.add("chosen");
+    visual_network_canvas.classList.add("hidden");
+    graph_canvas.classList.remove("hidden");
 }
 
 /**

@@ -1,9 +1,9 @@
 
 class Snake {
-    static FULL_LIFE = 100;
+    static FULL_LIFE = 150;
     static INPUT_NODES = 12;
-    static HIDDEN_NODES_1 = 8;
-    static HIDDEN_NODES_2 = 8;
+    static HIDDEN_NODES_1 = 12;
+    static HIDDEN_NODES_2 = 9;
     static OUTPUT_NODES = 4;
     static RANDOM_OUTPUT_TRESHOLD = 0;
     constructor(brain) {
@@ -87,23 +87,22 @@ class Snake {
 
         let inputs = [];
         //inputs 1-4: snake direction
-        inputs[0] = this.y_velocity > 0 ? 1 : 0; //down
-        inputs[1] = this.y_velocity < 0 ? 1 : 0; //up
-        inputs[2] = this.x_velocity > 0 ? 1 : 0; //right
-        inputs[3] = this.x_velocity < 0 ? 1 : 0; //left
+        inputs[0] = this.y_velocity < 0 ? 1 : 0; //up
+        inputs[1] = this.y_velocity > 0 ? 1 : 0; //down
+        inputs[2] = this.x_velocity < 0 ? 1 : 0; //left
+        inputs[3] = this.x_velocity > 0 ? 1 : 0; //right
 
         //inputs 5-8: relative distance from food
-        inputs[4] = food.x > 0 && food.y == 0 ? 1 : 0; //left
-        inputs[5] = food.x < 0 && food.y == 0 ? 1 : 0; //right
-        inputs[6] = food.y > 0 && food.x == 0 ? 1 : 0; //up
-        inputs[7] = food.y < 0 && food.x == 0 ? 1 : 0; //down
+        inputs[4] = food.y > 0 && food.x == 0 ? 1 : 0; //up
+        inputs[5] = food.y < 0 && food.x == 0 ? 1 : 0; //down
+        inputs[6] = food.x > 0 && food.y == 0 ? 1 : 0; //left
+        inputs[7] = food.x < 0 && food.y == 0 ? 1 : 0; //right
 
         //inputs 9-12: relative distance from walls
-
-        inputs[8] = wall.wall_up < WALL_DISTANCE_DANGER ? 1 : wall.wall_up < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_up < WALL_DISTANCE_FAR ? 0.25 : 0; //up
-        inputs[9] = wall.wall_down < WALL_DISTANCE_DANGER ? 1 : wall.wall_down < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_down < WALL_DISTANCE_FAR ? 0.25 : 0; //down
-        inputs[10] = wall.wall_left < WALL_DISTANCE_DANGER ? 1 : wall.wall_left < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_left < WALL_DISTANCE_FAR ? 0.25 : 0; //left
-        inputs[11] = wall.wall_right < WALL_DISTANCE_DANGER ? 1 : wall.wall_right < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_right < WALL_DISTANCE_FAR ? 0.25 : 0; //right
+        inputs[8] = wall.wall_up < WALL_DISTANCE_DANGER ? 1 : wall.wall_up < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_up < WALL_DISTANCE_FAR ? 0.25 : 0;
+        inputs[9] = wall.wall_down < WALL_DISTANCE_DANGER ? 1 : wall.wall_down < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_down < WALL_DISTANCE_FAR ? 0.25 : 0;
+        inputs[10] = wall.wall_left < WALL_DISTANCE_DANGER ? 1 : wall.wall_left < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_left < WALL_DISTANCE_FAR ? 0.25 : 0;
+        inputs[11] = wall.wall_right < WALL_DISTANCE_DANGER ? 1 : wall.wall_right < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_right < WALL_DISTANCE_FAR ? 0.25 : 0;
 
         //predict next move according to outputs
         let output = this.brain.predict(inputs);
@@ -122,14 +121,28 @@ class Snake {
 
         //Draw visual network
         if (drawVisualNetwork) this.displayVisualBrainNetwork(inputs, output, max_output_index);
-
     }
 
     displayVisualBrainNetwork(inputs, output, max_output_index) {
-        const visualNetworkCanvas = document.getElementById("visual_network");
-        const OUTPUT_LABELS = ["Up", "Down", "Left", "Right"];
-        const INPUT_LABELS = ["direction down", "direction up", "direction right", "direction left", "apple left", "apple right", "apple up", "apple down", "wall up", "wall down", "wall left", "wall right"];
-        drawVisualNetwork(visualNetworkCanvas, inputs, output, INPUT_LABELS, OUTPUT_LABELS, max_output_index);
+        const OUTPUT_LABELS = [
+            { text: "Up" },
+            { text: "Down" },
+            { text: "Left" },
+            { text: "Right" }];
+        const INPUT_LABELS = [
+            { text: "Direction up", color: "blue" },
+            { text: "Direction down", color: "blue" },
+            { text: "Direction left", color: "blue" },
+            { text: "Direction right", color: "blue" },
+            { text: "Apple up", color: "red" },
+            { text: "Apple down", color: "red" },
+            { text: "Apple left", color: "red" },
+            { text: "Apple right", color: "red" },
+            { text: "wall up", color: "gray" },
+            { text: "wall down", color: "gray" },
+            { text: "wall left", color: "gray" },
+            { text: "wall right", color: "gray" }];
+        drawVisualNetwork(visual_network_canvas, inputs, output, INPUT_LABELS, OUTPUT_LABELS, max_output_index);
     }
 
     update() {

@@ -5,21 +5,41 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    <title>Snake NeuroEvolution with tf.js</title>
+    <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <title>Snake NeuroEvolution with tf.js</title>
-</head>
-
-<body>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    <!-- Snake -->
     <script src="nn.js"></script>
     <script src="ga.js"></script>
     <script src="snake.js"></script>
     <script src="game.js"></script>
     <script src="visualNetwork.js"></script>
+</head>
+
+<body>
     <div id="main_container">
-        <canvas id="snake_game" onclick="getMousePos(event)"></canvas>
-        <canvas id="visual_network"></canvas>
+        <div id="game_canvas_wrapper">
+            <canvas id="snake_game" onclick="getMousePos(event)"></canvas>
+            <div id="visual_data">
+                <div class="visual_data_menu">
+                    <button onclick="showVisualNetwork()">Neural Network</button>
+                    <button onclick="showGraph()">Evolution Data</button>
+                </div>
+                <div>
+                    <canvas id="lineChart"></canvas>
+                    <canvas id="visual_network"></canvas>
+                </div>
+            </div>
+        </div>
         <span class="game_setup_wrapper_1">
             <div>Steps left: <span id="life">0</span></div>
             <div>Score: <span id="score">0</span></div>
@@ -37,7 +57,7 @@
                     </svg>
                 </button>
             </div>
-            <input type="checkbox" id="autosave" name="autosave" checked><label for="autosave">&nbsp;AutoSave best
+            <input type="checkbox" id="autosave" name="autosave"><label for="autosave">&nbsp;AutoSave best score
                 snakes</label>
             <br>
             <input type="checkbox" id="enable_walls" name="enable_walls" checked onchange="toggleWalls()"><label
@@ -65,14 +85,55 @@
             </table>
         </span>
     </div>
-    <div>Made By Ofek Mizrahi (c) 2021 <a><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+    <div id="footer">Made By Ofek Mizrahi (c) 2021 &nbsp;<a target="_blank"
+            href="https://github.com/ofekmiz/Neuro-Evolution-Snake-with-tf.js"><svg xmlns="http://www.w3.org/2000/svg"
+                width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
                 <path
                     d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
             </svg></a></div>
 </body>
 
 <style>
+    div#visual_data {
+        display: grid;
+        align-items: center;
+        width: 400px;
+        height: 430px;
+        justify-content: center;
+        margin-left: 20px;
+    }
+
+    button.chosen {
+        background-color: cyan;
+    }
+
+    div#visual_data button {
+        font-size: 14px;
+        margin: 5px;
+        margin-bottom: 10px;
+        margin-top: -10px;
+        width: 185px;
+    }
+
+    #game_canvas_wrapper {
+        display: grid;
+        justify-content: center;
+        align-items: center;
+        grid-auto-flow: column;
+        height: 450px;
+    }
+
+    #footer {
+        width: 100%;
+        text-align: center;
+        font-size: 14px;
+        color: gray;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     body {
         background-color: #e9ecef;
         padding: 20px;
@@ -152,12 +213,8 @@
         max-width: 60px;
     }
 
-    #visual_network {
-        padding: 10px;
-    }
-
     #snake_game {
-        border: 5px solid white;
+        border: 5px solid transparent;
     }
 
     #snake_game.walls {
@@ -165,7 +222,7 @@
     }
 
     .hidden {
-        display: none;
+        display: none !important;
     }
 </style>
 
