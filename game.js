@@ -54,7 +54,6 @@ window.onload = function () {
     crossover_rate_input.value = Snake.CROSSOVER_RATE;
 
     setup();
-    newGame();
     loadTrainedBrain();
 }
 
