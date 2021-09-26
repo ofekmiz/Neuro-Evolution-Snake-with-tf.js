@@ -55,6 +55,7 @@ window.onload = function () {
 
     setup();
     newGame();
+    loadTrainedBrain();
 }
 
 //RESET GAME SETUP
