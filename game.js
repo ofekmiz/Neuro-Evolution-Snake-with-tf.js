@@ -52,8 +52,7 @@ window.onload = function () {
     crossover_rate_input = document.getElementById("crossover_rate");
     mutate_rate_input.value = Snake.MUTATE_RATE;
     crossover_rate_input.value = Snake.CROSSOVER_RATE;
-
-    setup();
+    
     loadTrainedBrain();
 }
 
