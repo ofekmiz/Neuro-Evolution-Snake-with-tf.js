@@ -324,7 +324,7 @@ async function loadBrainFiles() {
 
 async function loadTrainedBrain() {
     try {
-        const model = await tf.loadLayersModel('https://raw.githubusercontent.com/ofekmiz/Neuro-Evolution-Snake-with-tf.js/main/snake_brains/record4_snake_gen_30_score_37_walls_true(0_39_16)(2021_9_26).json');
+        const model = await tf.loadLayersModel('https://github.com/ofekmiz/Neuro-Evolution-Snake-with-tf.js/blob/e62b2b330b2350c81ca4eaacccbf74b7d8b0e374/snake_brains/record4_snake_gen_30_score_37_walls_true(0_39_16)(2021_9_26).json');
         let brain = new NeuralNetwork(model, Snake.INPUT_NODES, Snake.HIDDEN_NODES, Snake.OUTPUT_NODES);
         setup(brain);
         newGame();
