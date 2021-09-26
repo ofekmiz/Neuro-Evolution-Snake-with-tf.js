@@ -2,27 +2,30 @@
 class Snake {
     static FULL_LIFE = 150;
     static INPUT_NODES = 12;
-    static HIDDEN_NODES_1 = 12;
-    static HIDDEN_NODES_2 = 9;
+    static HIDDEN_NODES = 20;
     static OUTPUT_NODES = 4;
     static RANDOM_OUTPUT_TRESHOLD = 0;
+    static MUTATE_RATE = 0.1;
+    static CROSSOVER_RATE = 0.1;
+
     constructor(brain) {
+        this.fitness = 0;
+        this.score = 0;
+        this.steps = 0;
+        this.hit_wall = false;
         this.y = getRandomInt(1, TILE_COUNT - 1);
         this.x = getRandomInt(1, TILE_COUNT - 1);
         this.x_velocity = 0;
         this.y_velocity = 0;
         this.tail_length = 3;
         this.trail = [];
-        this.score = 0;
         this.life = Snake.FULL_LIFE;
-        this.steps = 0;
-        this.hit_wall = false;
-        this.fitness = 0;
+
         if (brain !== "human") {
             if (brain) {
                 this.brain = brain.copy();
             } else {
-                this.brain = new NeuralNetwork(Snake.INPUT_NODES, Snake.HIDDEN_NODES_1, Snake.HIDDEN_NODES_2, Snake.OUTPUT_NODES);
+                this.brain = new NeuralNetwork(Snake.INPUT_NODES, Snake.HIDDEN_NODES, Snake.OUTPUT_NODES);
             }
         }
     }
@@ -56,8 +59,13 @@ class Snake {
         }
     }
 
-    mutate(rate) {
-        this.brain.mutate(rate);
+    mutate() {
+        this.brain.mutate(Snake.MUTATE_RATE);
+    }
+
+    crossover(otherSnake) {
+        this.brain.crossover(otherSnake.brain);
+        otherSnake.dispose();
     }
 
 
@@ -79,9 +87,6 @@ class Snake {
 
     think(drawVisualNetwork) {
 
-        const WALL_DISTANCE_FAR = 0.5;
-        const WALL_DISTANCE_MEDIUM = 0.3;
-        const WALL_DISTANCE_DANGER = 0.1;
         var food = this.foodDistance();
         var wall = this.wallDistance();
 
@@ -93,16 +98,20 @@ class Snake {
         inputs[3] = this.x_velocity > 0 ? 1 : 0; //right
 
         //inputs 5-8: relative distance from food
-        inputs[4] = food.y > 0 && food.x == 0 ? 1 : 0; //up
-        inputs[5] = food.y < 0 && food.x == 0 ? 1 : 0; //down
-        inputs[6] = food.x > 0 && food.y == 0 ? 1 : 0; //left
-        inputs[7] = food.x < 0 && food.y == 0 ? 1 : 0; //right
+        // inputs[4] = food.y > 0 && food.x == 0 ? 1 : 0; //up
+        // inputs[5] = food.y < 0 && food.x == 0 ? 1 : 0; //down
+        // inputs[6] = food.x > 0 && food.y == 0 ? 1 : 0; //left
+        // inputs[7] = food.x < 0 && food.y == 0 ? 1 : 0; //right
+        inputs[4] = food.y > 0 ? 1 - food.y : 0; //up
+        inputs[5] = food.y < 0 ? 1 + food.y : 0; //down
+        inputs[6] = food.x > 0 ? 1 - food.x : 0; //left
+        inputs[7] = food.x < 0 ? 1 + food.x : 0; //right
 
         //inputs 9-12: relative distance from walls
-        inputs[8] = wall.wall_up < WALL_DISTANCE_DANGER ? 1 : wall.wall_up < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_up < WALL_DISTANCE_FAR ? 0.25 : 0;
-        inputs[9] = wall.wall_down < WALL_DISTANCE_DANGER ? 1 : wall.wall_down < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_down < WALL_DISTANCE_FAR ? 0.25 : 0;
-        inputs[10] = wall.wall_left < WALL_DISTANCE_DANGER ? 1 : wall.wall_left < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_left < WALL_DISTANCE_FAR ? 0.25 : 0;
-        inputs[11] = wall.wall_right < WALL_DISTANCE_DANGER ? 1 : wall.wall_right < WALL_DISTANCE_MEDIUM ? 0.5 : wall.wall_right < WALL_DISTANCE_FAR ? 0.25 : 0;
+        inputs[8] = wall.wall_up;
+        inputs[9] = wall.wall_down;
+        inputs[10] = wall.wall_left;
+        inputs[11] = wall.wall_right;
 
         //predict next move according to outputs
         let output = this.brain.predict(inputs);

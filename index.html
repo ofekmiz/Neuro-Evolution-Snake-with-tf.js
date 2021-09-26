@@ -41,35 +41,57 @@
             </div>
         </div>
         <span class="game_setup_wrapper_1">
-            <div>Steps left: <span id="life">0</span></div>
-            <div>Score: <span id="score">0</span></div>
-            <div>Best score: <span id="best_score">0</span></div>
-            <div>Total games: <span id="games">0</span></div>
-            <div>Generation: <span id="generation">0</span> (next: <span id="next_generation">0</span> games)</div>
-            <div>Speed: <input type="range" min="0" max="200" value="15" class="slider" id="game_rate"
-                    onchange="updateGameRate(this.value)">
-                <button id="game_rate_reset" type="button" onclick="resetRate()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z" />
-                        <path
-                            d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z" />
-                    </svg>
-                </button>
+            <div class="section1">
+                <div>Score: <span id="score">0</span></div>
+                <div>High Score: <span id="best_score">0</span></div>
+                <div>Steps left: <span id="life">0</span></div>
+                <div>Total games: <span id="games">0</span></div>
+                <div>Generation: <span id="generation">0</span> (next: <span id="next_generation">0</span> games)</div>
+                <span class="note">(Mutation: <span id="current_mutate_rate">0</span> , </span>
+                <span class="note">Crossover: <span id="current_crossover_rate">0</span>)</span>
             </div>
-            <input type="checkbox" id="autosave" name="autosave"><label for="autosave">&nbsp;AutoSave best score
-                snakes</label>
-            <br>
-            <input type="checkbox" id="enable_walls" name="enable_walls" checked onchange="toggleWalls()"><label
-                for="enable_walls">&nbsp;Enable walls</label>
+            <div class="section2">
+                <div>Speed: <input type="range" min="0" max="200" value="15" class="slider" id="game_rate"
+                        onchange="updateGameRate(this.value)">
+                    <button class="game_rate_reset" type="button" onclick="resetRate(0)">0</button>
+                    <button class="game_rate_reset" type="button" onclick="resetRate(2)">1</button>
+                    <button class="game_rate_reset" type="button" onclick="resetRate(5)">2</button>
+                    <button class="game_rate_reset" type="button" onclick="resetRate(15)">3</button>
+                    <button class="game_rate_reset" type="button" onclick="resetRate(30)">4</button>
+                    <button class="game_rate_reset" type="button" onclick="resetRate(100)">5</button>
+                    <button class="game_rate_reset" type="button" onclick="resetRate(200)">6</button>
+                </div>
+                <input type="checkbox" id="enable_walls" name="enable_walls" checked onchange="toggleWalls()">
+                <label for="enable_walls">&nbsp;Enable walls</label>
+                <br>
+                <!-- <inputtype="checkbox" id="show_sensors" name="show_sensors " checked>
+                <labe for="show_sensors">&nbsp;Show sensors</label>
+                <br> -->
+                <input type="checkbox" id="autosave" name="autosave">
+                <label for="autosave">&nbsp;AutoSave High Score snake</label>
+                <br>
+                <input type="checkbox" id="autosave2" name="autosave2">
+                <label for="autosave2">&nbsp;AutoSave best fitness snake in generation</label>
+                <br>
+                <label for="file_mark">Mark downloaded files: </label>
+                <input type="text" id="file_mark" name="file_mark">
+            </div>
         </span>
         <hr>
         <span class="game_setup_wrapper_2">
             <label for="total_snakes">Snakes in generation: </label>
-            <input type="number" id="total_snakes" name="total_snakes" min="1">
-            <button type="button" onclick="loadTrainedBrain()">Run trained AI</button>
+            <input type="number" id="total_snakes" name="total_snakes" min="10" max="5000"
+                onchange="imposeMinMax(this)">&nbsp;
+            <label for="mutate_rate">Mutate rate: </label>
+            <input type="number" id="mutate_rate" name="mutate_rate" min="0.01" max="0.5" step="0.01"
+                onchange="imposeMinMax(this)">
+            <label for="crossover_rate">Crossover rate:</label>
+            <input type="number" id="crossover_rate" name="crossover_rate" min="0" max="1" step="0.1"
+                onchange="imposeMinMax(this)">
+            <br>
             <button type="button" onclick="resetGame()">Train new AI</button>
-            <button type="button" onclick="resetGame('human')">Play Human</button>
+            <button type="button" onclick="loadTrainedBrain()">Run trained AI</button>
+            <button type="button" onclick="alert('Use arrow keys to play');resetGame('human');">Play Human</button>
             <br>
             <table class="load_files_box">
                 <tr>
@@ -94,6 +116,11 @@
 </body>
 
 <style>
+    .note {
+        font-size: 12px;
+        color: gray;
+    }
+
     div#visual_data {
         display: grid;
         align-items: center;
@@ -104,7 +131,7 @@
     }
 
     button.chosen {
-        background-color: cyan;
+        font-weight: bold;
     }
 
     div#visual_data button {
@@ -148,12 +175,22 @@
         line-height: 30px;
     }
 
+    input[type="text"],
+    input[type="number"] {
+        line-height: initial;
+    }
+
     .game_setup_wrapper_1 {
-        display: block;
-        width: 600px;
+        display: flex;
+        justify-content: center;
         margin: auto;
         text-align: left;
         margin-top: 15px;
+    }
+
+    .game_setup_wrapper_1 .section1,
+    .game_setup_wrapper_1 .section1 {
+        margin: 10px 50px;
     }
 
     #main_container {
@@ -188,7 +225,7 @@
         font-size: 14px;
     }
 
-    #game_rate_reset {
+    .game_rate_reset {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -197,6 +234,7 @@
         width: 20px;
         padding: 2px;
         vertical-align: middle;
+        font-size: 12px;
     }
 
     .game_setup_wrapper_2 button,
@@ -205,7 +243,7 @@
     }
 
     .slider {
-        width: 300px;
+        width: 175px;
         vertical-align: middle;
     }
 
@@ -224,6 +262,14 @@
     .hidden {
         display: none !important;
     }
+
+    #mutate_rate,
+    #crossover_rate {
+        width: 55px;
+    }
+
+    #file_mark {
+        width: 150px;
 </style>
 
 </html>
