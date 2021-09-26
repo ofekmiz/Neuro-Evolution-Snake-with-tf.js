@@ -6,7 +6,7 @@ class Snake {
     static OUTPUT_NODES = 4;
     static RANDOM_OUTPUT_TRESHOLD = 0;
     static MUTATE_RATE = 0.1;
-    static CROSSOVER_RATE = 0.1;
+    static CROSSOVER_RATE = 0.25;
 
     constructor(brain) {
         this.fitness = 0;
