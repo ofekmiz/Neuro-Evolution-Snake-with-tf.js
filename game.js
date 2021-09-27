@@ -52,7 +52,7 @@ window.onload = function () {
     crossover_rate_input = document.getElementById("crossover_rate");
     mutate_rate_input.value = Snake.MUTATE_RATE;
     crossover_rate_input.value = Snake.CROSSOVER_RATE;
-    
+
     loadTrainedBrain();
 }
 
@@ -111,7 +111,7 @@ function newGame() {
 function appleRandomPosition() {
     let apple_x = getRandomInt(1, TILE_COUNT - 1);
     let apple_y = getRandomInt(1, TILE_COUNT - 1);
-    while (apple_x == current_snake.x && apple_y == current_snake.y) {
+    while (apple_x == current_snake.x && apple_y == current_snake.y && current_snake.trail.filter(e => e.x == apple_x && e.y == apple_y).length > 0) {
         apple_x = getRandomInt(1, TILE_COUNT - 1);
         apple_y = getRandomInt(1, TILE_COUNT - 1);
     }
