@@ -7,7 +7,7 @@ function drawVisualNetwork(canvas, inputs, outputs, input_labels, output_labels,
     const OUTPUT_NODE_SPACING = 50;
     const GREEN_OUTPUT_TRESHOLD = 0.5;
     canvas.width = 320;
-    canvas.height = 425;
+    canvas.height = 430;
 
     /** @type {CanvasRenderingContext2D} */
     var ctx = canvas.getContext("2d");
@@ -82,8 +82,8 @@ function drawRect(ctx, center_x, center_y, width, height, color, text) {
 }
 
 function drawGenerationGraph(canvas) {
-    canvas.width = CANVAS_SIZE;
-    canvas.height = CANVAS_SIZE;
+    canvas.width = 400;
+    canvas.height = 430;
     var ctxL = canvas.getContext('2d');
     if (canvas.chart) canvas.chart.destroy();
     var labels = [];

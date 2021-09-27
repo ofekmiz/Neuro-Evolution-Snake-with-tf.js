@@ -125,7 +125,9 @@
         display: grid;
         align-items: center;
         width: 400px;
-        height: 430px;
+        max-width: 100%;
+        height: auto;
+        min-height: 430px;
         justify-content: center;
     }
 
@@ -142,13 +144,14 @@
     }
 
     #game_canvas_wrapper {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         flex-wrap: wrap;
-        gap: 1em !important;
-        height: auto !important;
-        margin: auto !important;
+        gap: 1em;
+        height: auto;
+        margin: auto;
+        min-height: 480px;
     }
 
     #footer {
@@ -221,7 +224,7 @@
     table button {
         width: 100%;
         display: block;
-        margin-top: 5px !important;
+        margin-top: 5px;
     }
 
     td {
@@ -250,6 +253,7 @@
 
     .slider {
         width: 175px;
+        max-width: fit-content;
         vertical-align: middle;
     }
 
@@ -276,6 +280,25 @@
 
     #file_mark {
         width: 150px;
+    }
+
+    canvas#snake_game,
+    canvas#visual_network {
+        max-width: 100%;
+    }
+
+    canvas#lineChart {
+        max-width: 100%;
+    }
+
+    @media only screen and (max-width: 800px) {
+
+        .game_setup_wrapper_1 .section1,
+        .game_setup_wrapper_1 .section2 {
+            margin: 10px 10px;
+            font-size: 12px;
+        }
+    }
 </style>
 
 </html>
